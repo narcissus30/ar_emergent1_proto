@@ -18,7 +18,11 @@ import {
   Plus, 
   Trash2,
   AlertCircle,
-  Target
+  Target,
+  Upload,
+  Link,
+  File,
+  CloudUpload
 } from 'lucide-react';
 
 const WorkflowBuilder = () => {
