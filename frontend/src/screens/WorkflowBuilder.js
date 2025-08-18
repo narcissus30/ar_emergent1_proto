@@ -168,61 +168,255 @@ const WorkflowBuilder = () => {
       case 1:
         return (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Label htmlFor="platform">Lead Source Platform</Label>
-                <Select>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Select your CRM platform" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="salesforce">Salesforce</SelectItem>
-                    <SelectItem value="hubspot">HubSpot</SelectItem>
-                    <SelectItem value="slate">Slate</SelectItem>
-                    <SelectItem value="crm">Custom CRM</SelectItem>
-                    <SelectItem value="excel">Excel/CSV Import</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="syncFrequency">Sync Frequency</Label>
-                <Select>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="How often to sync data" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="realtime">Real-time</SelectItem>
-                    <SelectItem value="hourly">Every Hour</SelectItem>
-                    <SelectItem value="daily">Daily</SelectItem>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+            {/* Integration Type Selection */}
             <div>
-              <Label htmlFor="apiKey">API Key / Connection String</Label>
-              <Input
-                id="apiKey"
-                type="password"
-                placeholder="Enter your API key or connection details"
-                className="mt-2"
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                This will be used to securely connect to your lead source platform
-              </p>
-            </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-start space-x-3">
-                <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
-                <div>
-                  <h4 className="font-medium text-blue-900">Integration Preview</h4>
-                  <p className="text-sm text-blue-700">
-                    Once connected, leads will automatically flow into your admission pipeline. 
-                    The system will track lead sources, engagement metrics, and conversion rates.
-                  </p>
+              <Label className="text-base font-medium mb-4 block">Choose Lead Integration Method</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div 
+                  className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
+                    workflowData.leadSource.integrationType === 'api' 
+                      ? 'border-blue-500 bg-blue-50' 
+                      : 'border-gray-200 hover:border-gray-300 bg-white'
+                  }`}
+                  onClick={() => handleIntegrationTypeChange('api')}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                      workflowData.leadSource.integrationType === 'api' 
+                        ? 'bg-blue-100' 
+                        : 'bg-gray-100'
+                    }`}>
+                      <Link className={`w-6 h-6 ${
+                        workflowData.leadSource.integrationType === 'api' 
+                          ? 'text-blue-600' 
+                          : 'text-gray-600'
+                      }`} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">API Integration</h3>
+                      <p className="text-sm text-gray-600">Connect directly to your CRM or lead management platform</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 text-sm text-gray-600">
+                    • Real-time data synchronization<br/>
+                    • Automatic lead updates<br/>
+                    • Supports Salesforce, HubSpot, Slate, and more
+                  </div>
+                </div>
+
+                <div 
+                  className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
+                    workflowData.leadSource.integrationType === 'file' 
+                      ? 'border-blue-500 bg-blue-50' 
+                      : 'border-gray-200 hover:border-gray-300 bg-white'
+                  }`}
+                  onClick={() => handleIntegrationTypeChange('file')}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                      workflowData.leadSource.integrationType === 'file' 
+                        ? 'bg-blue-100' 
+                        : 'bg-gray-100'
+                    }`}>
+                      <Upload className={`w-6 h-6 ${
+                        workflowData.leadSource.integrationType === 'file' 
+                          ? 'text-blue-600' 
+                          : 'text-gray-600'
+                      }`} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">File Upload</h3>
+                      <p className="text-sm text-gray-600">Upload leads data from CSV or Excel files</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 text-sm text-gray-600">
+                    • One-time or periodic uploads<br/>
+                    • Supports CSV and Excel formats<br/>
+                    • Easy migration from existing systems
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* API Integration Fields */}
+            {workflowData.leadSource.integrationType === 'api' && (
+              <div className="space-y-6 p-6 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-center space-x-3 mb-4">
+                  <Link className="w-5 h-5 text-blue-600" />
+                  <h4 className="text-lg font-semibold text-blue-900">API Configuration</h4>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="platform">Lead Source Platform</Label>
+                    <Select>
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="Select your CRM platform" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="salesforce">Salesforce</SelectItem>
+                        <SelectItem value="hubspot">HubSpot</SelectItem>
+                        <SelectItem value="slate">Slate</SelectItem>
+                        <SelectItem value="crm">Custom CRM</SelectItem>
+                        <SelectItem value="pipedrive">Pipedrive</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="syncFrequency">Sync Frequency</Label>
+                    <Select>
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="How often to sync data" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="realtime">Real-time</SelectItem>
+                        <SelectItem value="hourly">Every Hour</SelectItem>
+                        <SelectItem value="daily">Daily</SelectItem>
+                        <SelectItem value="weekly">Weekly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="apiKey">API Key / Connection String</Label>
+                  <Input
+                    id="apiKey"
+                    type="password"
+                    placeholder="Enter your API key or connection details"
+                    className="mt-2"
+                  />
+                  <p className="text-sm text-gray-600 mt-1">
+                    This will be used to securely connect to your lead source platform
+                  </p>
+                </div>
+                <div className="bg-blue-100 border border-blue-300 rounded-lg p-4">
+                  <div className="flex items-start space-x-3">
+                    <AlertCircle className="w-5 h-5 text-blue-700 mt-0.5" />
+                    <div>
+                      <h5 className="font-medium text-blue-900">API Integration Benefits</h5>
+                      <p className="text-sm text-blue-800">
+                        Real-time synchronization ensures your lead data is always up-to-date. 
+                        The system will automatically track lead sources, engagement metrics, and conversion rates.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* File Upload Fields */}
+            {workflowData.leadSource.integrationType === 'file' && (
+              <div className="space-y-6 p-6 bg-green-50 rounded-lg border border-green-200">
+                <div className="flex items-center space-x-3 mb-4">
+                  <File className="w-5 h-5 text-green-600" />
+                  <h4 className="text-lg font-semibold text-green-900">File Upload Configuration</h4>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="fileUpload" className="text-base font-medium">
+                      Upload Leads Data File
+                    </Label>
+                    <div className="mt-2">
+                      <div className="flex items-center justify-center w-full">
+                        <label htmlFor="fileUpload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-green-300 border-dashed rounded-lg cursor-pointer bg-green-25 hover:bg-green-100 transition-colors">
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <CloudUpload className="w-10 h-10 mb-3 text-green-600" />
+                            <p className="mb-2 text-sm text-green-700">
+                              <span className="font-semibold">Click to upload</span> or drag and drop
+                            </p>
+                            <p className="text-xs text-green-600">CSV, XLSX, or XLS files (MAX. 10MB)</p>
+                          </div>
+                          <input 
+                            id="fileUpload" 
+                            type="file" 
+                            className="hidden" 
+                            accept=".csv,.xlsx,.xls"
+                            onChange={handleFileUpload}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                    
+                    {workflowData.leadSource.fileName && (
+                      <div className="mt-4 p-4 bg-green-100 rounded-lg border border-green-200">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <File className="w-5 h-5 text-green-600" />
+                            <div>
+                              <p className="text-sm font-medium text-green-900">
+                                {workflowData.leadSource.fileName}
+                              </p>
+                              <p className="text-xs text-green-600">
+                                File selected successfully
+                              </p>
+                            </div>
+                          </div>
+                          <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                            <Upload className="w-3 h-3 mr-1" />
+                            Confirm Upload
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Expected Data Format</Label>
+                      <div className="mt-2 text-sm text-gray-600 bg-white p-3 rounded-lg border">
+                        <div className="font-medium mb-2">Required Columns:</div>
+                        <div className="space-y-1">
+                          <div>• Name (First Name, Last Name)</div>
+                          <div>• Email Address</div>
+                          <div>• Phone Number</div>
+                          <div>• Country/Region</div>
+                          <div>• Program Interest</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label>Upload Schedule</Label>
+                      <Select>
+                        <SelectTrigger className="mt-2">
+                          <SelectValue placeholder="How often will you upload?" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="one-time">One-time Upload</SelectItem>
+                          <SelectItem value="weekly">Weekly Updates</SelectItem>
+                          <SelectItem value="monthly">Monthly Updates</SelectItem>
+                          <SelectItem value="quarterly">Quarterly Updates</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-green-100 border border-green-300 rounded-lg p-4">
+                  <div className="flex items-start space-x-3">
+                    <AlertCircle className="w-5 h-5 text-green-700 mt-0.5" />
+                    <div>
+                      <h5 className="font-medium text-green-900">File Upload Benefits</h5>
+                      <p className="text-sm text-green-800">
+                        Perfect for migrating existing lead data or periodic bulk updates. 
+                        The system will automatically validate, clean, and organize your lead data for optimal processing.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!workflowData.leadSource.integrationType && (
+              <div className="text-center py-8">
+                <Database className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Choose Your Integration Method</h3>
+                <p className="text-gray-600">
+                  Select either API Integration for real-time sync or File Upload for manual data import
+                </p>
+              </div>
+            )}
           </div>
         );
 
