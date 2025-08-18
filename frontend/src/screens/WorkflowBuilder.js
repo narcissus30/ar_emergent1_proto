@@ -84,7 +84,34 @@ const WorkflowBuilder = () => {
     }
   ];
 
-  const addCustomField = () => {
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setWorkflowData({
+        ...workflowData,
+        leadSource: {
+          ...workflowData.leadSource,
+          uploadedFile: file,
+          fileName: file.name
+        }
+      });
+    }
+  };
+
+  const handleIntegrationTypeChange = (type) => {
+    setWorkflowData({
+      ...workflowData,
+      leadSource: {
+        ...workflowData.leadSource,
+        integrationType: type,
+        // Reset other fields when switching types
+        platform: '',
+        apiKey: '',
+        uploadedFile: null,
+        fileName: ''
+      }
+    });
+  };
     setWorkflowData({
       ...workflowData,
       applicationRequirements: {
