@@ -26,9 +26,12 @@ const WorkflowBuilder = () => {
   const [activeStage, setActiveStage] = useState(1);
   const [workflowData, setWorkflowData] = useState({
     leadSource: {
+      integrationType: '', // 'api' or 'file'
       platform: '',
       apiKey: '',
-      syncFrequency: 'daily'
+      syncFrequency: 'daily',
+      uploadedFile: null,
+      fileName: ''
     },
     applicationRequirements: {
       documents: ['Resume/CV', 'Statement of Purpose', 'Letter of Recommendation'],
