@@ -1,53 +1,66 @@
-import { useEffect } from "react";
-import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import './App.css';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// Screen Components
+import LoginScreen from './screens/LoginScreen';
+import WorkflowBuilder from './screens/WorkflowBuilder';
+import AIReviewScreen from './screens/AIReviewScreen';
+import ApplicationDistribution from './screens/ApplicationDistribution';
+import ScholarshipManagement from './screens/ScholarshipManagement';
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+// Layout Component
+import Layout from './components/Layout';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [universityData, setUniversityData] = useState(null);
+
+  const handleLogin = (data) => {
+    setIsAuthenticated(true);
+    setUniversityData(data);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setUniversityData(null);
+  };
+
   return (
-    <div className="App">
-      <BrowserRouter>
+    <Router>
+      <div className="App">
         <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
+          <Route 
+            path="/login" 
+            element={
+              !isAuthenticated ? (
+                <LoginScreen onLogin={handleLogin} />
+              ) : (
+                <Navigate to="/workflow-builder" />
+              )
+            } 
+          />
+          <Route
+            path="/*"
+            element={
+              isAuthenticated ? (
+                <Layout universityData={universityData} onLogout={handleLogout}>
+                  <Routes>
+                    <Route path="/workflow-builder" element={<WorkflowBuilder />} />
+                    <Route path="/ai-review" element={<AIReviewScreen />} />
+                    <Route path="/application-distribution" element={<ApplicationDistribution />} />
+                    <Route path="/scholarship-management" element={<ScholarshipManagement />} />
+                    <Route path="/" element={<Navigate to="/workflow-builder" />} />
+                  </Routes>
+                </Layout>
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
         </Routes>
-      </BrowserRouter>
-    </div>
+      </div>
+    </Router>
   );
 }
 
