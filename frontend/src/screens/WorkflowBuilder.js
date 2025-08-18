@@ -112,6 +112,8 @@ const WorkflowBuilder = () => {
       }
     });
   };
+
+  const addCustomField = () => {
     setWorkflowData({
       ...workflowData,
       applicationRequirements: {
