@@ -8,7 +8,8 @@ import {
   Workflow, 
   Brain, 
   Users, 
-  GraduationCap 
+  GraduationCap,
+  BarChart3
 } from 'lucide-react';
 
 const Layout = ({ children, universityData, onLogout }) => {
