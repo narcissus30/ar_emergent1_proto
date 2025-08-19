@@ -7,6 +7,7 @@ import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Textarea } from '../components/ui/textarea';
 import { Badge } from '../components/ui/badge';
+import { Checkbox } from '../components/ui/checkbox';
 import { 
   Settings, 
   Database, 
@@ -22,12 +23,21 @@ import {
   Upload,
   Link,
   File,
-  CloudUpload
+  CloudUpload,
+  GraduationCap,
+  BarChart3,
+  Download,
+  Users,
+  CheckSquare,
+  Square
 } from 'lucide-react';
 
 const WorkflowBuilder = () => {
   const navigate = useNavigate();
   const [activeStage, setActiveStage] = useState(1);
+  const [selectedLeads, setSelectedLeads] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  
   const [workflowData, setWorkflowData] = useState({
     leadSource: {
       integrationType: '', // 'api' or 'file'
@@ -36,6 +46,15 @@ const WorkflowBuilder = () => {
       syncFrequency: 'daily',
       uploadedFile: null,
       fileName: ''
+    },
+    programConfiguration: {
+      selectedProgram: '',
+      programDetails: {
+        name: '',
+        duration: '',
+        departments: [],
+        specializations: []
+      }
     },
     applicationRequirements: {
       documents: ['Resume/CV', 'Statement of Purpose', 'Letter of Recommendation'],
@@ -53,6 +72,31 @@ const WorkflowBuilder = () => {
     }
   });
 
+  // Mock lead data for demonstration
+  const mockLeads = [
+    { id: 1, name: 'John Smith', email: 'john@email.com', program: 'Full-Time MBA', source: 'Website', status: 'New' },
+    { id: 2, name: 'Sarah Johnson', email: 'sarah@email.com', program: 'MS in Cybersecurity', source: 'University Fair', status: 'Contacted' },
+    { id: 3, name: 'Michael Brown', email: 'michael@email.com', program: 'Full-Time MBA', source: 'Social Media', status: 'Applied' },
+    { id: 4, name: 'Emma Wilson', email: 'emma@email.com', program: 'MS in Cybersecurity', source: 'Referral', status: 'New' }
+  ];
+
+  const programs = [
+    {
+      id: 'mba',
+      name: 'Full-Time MBA',
+      duration: '2 Years',
+      departments: ['Business Administration', 'Finance', 'Marketing', 'Operations'],
+      specializations: ['Finance', 'Marketing', 'Operations Management', 'Strategy', 'Entrepreneurship']
+    },
+    {
+      id: 'cybersecurity',
+      name: 'MS in Cybersecurity',
+      duration: '1.5 Years', 
+      departments: ['Computer Science', 'Information Technology', 'Cybersecurity'],
+      specializations: ['Network Security', 'Digital Forensics', 'Risk Management', 'Ethical Hacking', 'Security Architecture']
+    }
+  ];
+
   const stages = [
     {
       id: 1,
@@ -63,23 +107,37 @@ const WorkflowBuilder = () => {
     },
     {
       id: 2,
+      title: 'Program Configuration',
+      description: 'Select and configure academic programs',
+      icon: GraduationCap,
+      isCompleted: false
+    },
+    {
+      id: 3,
       title: 'Application Requirements',
       description: 'Define required documents and application fields',
       icon: FileText,
       isCompleted: false
     },
     {
-      id: 3,
+      id: 4,
       title: 'Admission Criteria',
       description: 'Set AI evaluation rules and requirements',
       icon: Brain,
       isCompleted: false
     },
     {
-      id: 4,
+      id: 5,
       title: 'Scholarship Rules',
       description: 'Configure scholarship eligibility and allocation',
       icon: Target,
+      isCompleted: false
+    },
+    {
+      id: 6,
+      title: 'Analytics Dashboard',
+      description: 'View efficiency metrics and performance insights',
+      icon: BarChart3,
       isCompleted: false
     }
   ];
@@ -111,6 +169,51 @@ const WorkflowBuilder = () => {
         fileName: ''
       }
     });
+  };
+
+  const handleProgramSelect = (programId) => {
+    const selectedProgram = programs.find(p => p.id === programId);
+    setWorkflowData({
+      ...workflowData,
+      programConfiguration: {
+        selectedProgram: programId,
+        programDetails: selectedProgram || {}
+      }
+    });
+  };
+
+  const handleLeadSelect = (leadId) => {
+    setSelectedLeads(prev => 
+      prev.includes(leadId) 
+        ? prev.filter(id => id !== leadId)
+        : [...prev, leadId]
+    );
+  };
+
+  const handleSelectAllLeads = () => {
+    if (selectAll) {
+      setSelectedLeads([]);
+    } else {
+      setSelectedLeads(mockLeads.map(lead => lead.id));
+    }
+    setSelectAll(!selectAll);
+  };
+
+  const exportToCSV = (data, filename) => {
+    const csvContent = [
+      Object.keys(data[0]).join(','),
+      ...data.map(row => Object.values(row).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   };
 
   const addCustomField = () => {
@@ -155,7 +258,7 @@ const WorkflowBuilder = () => {
   };
 
   const handleNext = () => {
-    if (activeStage < 4) {
+    if (activeStage < 6) {
       setActiveStage(activeStage + 1);
     } else {
       // Save workflow and navigate to AI Review
@@ -423,8 +526,112 @@ const WorkflowBuilder = () => {
       case 2:
         return (
           <div className="space-y-6">
+            {/* Program Selection */}
             <div>
-              <Label>Required Documents</Label>
+              <Label className="text-base font-medium mb-4 block">Select Academic Program</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {programs.map((program) => (
+                  <div
+                    key={program.id}
+                    className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
+                      workflowData.programConfiguration.selectedProgram === program.id
+                        ? 'border-purple-500 bg-purple-50'
+                        : 'border-gray-200 hover:border-gray-300 bg-white'
+                    }`}
+                    onClick={() => handleProgramSelect(program.id)}
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                        workflowData.programConfiguration.selectedProgram === program.id
+                          ? 'bg-purple-100'
+                          : 'bg-gray-100'
+                      }`}>
+                        <GraduationCap className={`w-6 h-6 ${
+                          workflowData.programConfiguration.selectedProgram === program.id
+                            ? 'text-purple-600'
+                            : 'text-gray-600'
+                        }`} />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">{program.name}</h3>
+                        <p className="text-sm text-gray-600">Duration: {program.duration}</p>
+                      </div>
+                    </div>
+                    
+                    {workflowData.programConfiguration.selectedProgram === program.id && (
+                      <div className="mt-4 space-y-3">
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-2">Departments</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {program.departments.map((dept, index) => (
+                              <Badge key={index} variant="outline" className="bg-purple-50 border-purple-200 text-purple-700">
+                                {dept}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-2">Specializations</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {program.specializations.map((spec, index) => (
+                              <Badge key={index} variant="outline" className="bg-purple-50 border-purple-200 text-purple-700">
+                                {spec}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {workflowData.programConfiguration.selectedProgram && (
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="w-5 h-5 text-purple-600 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-purple-900">Program Configuration Complete</h4>
+                    <p className="text-sm text-purple-700">
+                      You've selected {workflowData.programConfiguration.programDetails.name}. 
+                      The subsequent workflow stages will be customized for this program's specific requirements and criteria.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!workflowData.programConfiguration.selectedProgram && (
+              <div className="text-center py-8">
+                <GraduationCap className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Choose Your Program</h3>
+                <p className="text-gray-600">
+                  Select the academic program to configure application requirements and admission criteria
+                </p>
+              </div>
+            )}
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-6">
+            {/* Export Button */}
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Application Requirements Configuration</h3>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => exportToCSV(mockLeads, 'application-requirements')}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export CSV
+              </Button>
+            </div>
+
+            <div>
+              <Label>Required Documents {workflowData.programConfiguration.programDetails.name && `for ${workflowData.programConfiguration.programDetails.name}`}</Label>
               <div className="mt-2 space-y-2">
                 {workflowData.applicationRequirements.documents.map((doc, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -480,6 +687,73 @@ const WorkflowBuilder = () => {
               </div>
             </div>
 
+            {/* Leads Management Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>Current Leads {workflowData.programConfiguration.programDetails.name && `for ${workflowData.programConfiguration.programDetails.name}`}</Label>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleSelectAllLeads}
+                  >
+                    {selectAll ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                    <span className="ml-2">Select All</span>
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={selectedLeads.length === 0}
+                    onClick={() => alert(`Bulk action for ${selectedLeads.length} leads`)}
+                  >
+                    <Users className="w-4 h-4 mr-2" />
+                    Bulk Action ({selectedLeads.length})
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="border rounded-lg overflow-hidden">
+                <div className="bg-gray-50 p-3 border-b">
+                  <div className="grid grid-cols-6 gap-4 text-sm font-medium text-gray-700">
+                    <div>Select</div>
+                    <div>Name</div>
+                    <div>Email</div>
+                    <div>Program</div>
+                    <div>Source</div>
+                    <div>Status</div>
+                  </div>
+                </div>
+                <div className="divide-y">
+                  {mockLeads.map((lead) => (
+                    <div key={lead.id} className="grid grid-cols-6 gap-4 p-3 text-sm hover:bg-gray-50">
+                      <div>
+                        <Checkbox
+                          checked={selectedLeads.includes(lead.id)}
+                          onCheckedChange={() => handleLeadSelect(lead.id)}
+                        />
+                      </div>
+                      <div className="font-medium">{lead.name}</div>
+                      <div className="text-gray-600">{lead.email}</div>
+                      <div>
+                        <Badge variant={lead.program === 'Full-Time MBA' ? 'default' : 'secondary'}>
+                          {lead.program}
+                        </Badge>
+                      </div>
+                      <div className="text-gray-600">{lead.source}</div>
+                      <div>
+                        <Badge variant={
+                          lead.status === 'New' ? 'destructive' :
+                          lead.status === 'Contacted' ? 'default' : 'secondary'
+                        }>
+                          {lead.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <div className="flex items-start space-x-3">
                 <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
@@ -495,12 +769,25 @@ const WorkflowBuilder = () => {
           </div>
         );
 
-      case 3:
+      case 4:
         return (
           <div className="space-y-6">
+            {/* Export Button */}
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Admission Criteria Configuration</h3>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => exportToCSV(mockLeads, 'admission-criteria')}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export CSV
+              </Button>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="minGPA">Minimum GPA Requirement</Label>
+                <Label htmlFor="minGPA">Minimum GPA Requirement {workflowData.programConfiguration.programDetails.name && `for ${workflowData.programConfiguration.programDetails.name}`}</Label>
                 <Input
                   id="minGPA"
                   type="number"
@@ -555,6 +842,50 @@ const WorkflowBuilder = () => {
               </div>
             </div>
 
+            {/* Leads Status for Admission */}
+            <div className="space-y-4">
+              <Label>Lead Status & Admission Tracking</Label>
+              <div className="border rounded-lg overflow-hidden">
+                <div className="bg-gray-50 p-3 border-b">
+                  <div className="grid grid-cols-7 gap-4 text-sm font-medium text-gray-700">
+                    <div>Select</div>
+                    <div>Name</div>
+                    <div>Program</div>
+                    <div>GPA</div>
+                    <div>Experience</div>
+                    <div>Status</div>
+                    <div>Action</div>
+                  </div>
+                </div>
+                <div className="divide-y">
+                  {mockLeads.map((lead) => (
+                    <div key={lead.id} className="grid grid-cols-7 gap-4 p-3 text-sm hover:bg-gray-50">
+                      <div>
+                        <Checkbox
+                          checked={selectedLeads.includes(lead.id)}
+                          onCheckedChange={() => handleLeadSelect(lead.id)}
+                        />
+                      </div>
+                      <div className="font-medium">{lead.name}</div>
+                      <div>
+                        <Badge variant={lead.program === 'Full-Time MBA' ? 'default' : 'secondary'}>
+                          {lead.program}
+                        </Badge>
+                      </div>
+                      <div>3.{Math.floor(Math.random() * 5) + 2}</div>
+                      <div>{Math.floor(Math.random() * 5) + 1} yrs</div>
+                      <div>
+                        <Badge variant="default">Evaluating</Badge>
+                      </div>
+                      <div>
+                        <Button size="sm" variant="ghost">Review</Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
               <div className="flex items-start space-x-3">
                 <Brain className="w-5 h-5 text-purple-600 mt-0.5" />
@@ -570,11 +901,24 @@ const WorkflowBuilder = () => {
           </div>
         );
 
-      case 4:
+      case 5:
         return (
           <div className="space-y-6">
+            {/* Export Button */}
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Scholarship Rules Configuration</h3>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => exportToCSV(mockLeads, 'scholarship-rules')}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export CSV
+              </Button>
+            </div>
+
             <div>
-              <Label htmlFor="budgetAllocation">Total Scholarship Budget</Label>
+              <Label htmlFor="budgetAllocation">Total Scholarship Budget {workflowData.programConfiguration.programDetails.name && `for ${workflowData.programConfiguration.programDetails.name}`}</Label>
               <Input
                 id="budgetAllocation"
                 type="number"
@@ -605,6 +949,50 @@ const WorkflowBuilder = () => {
               </div>
             </div>
 
+            {/* Scholarship Allocation Table */}
+            <div className="space-y-4">
+              <Label>Scholarship Allocation Status</Label>
+              <div className="border rounded-lg overflow-hidden">
+                <div className="bg-gray-50 p-3 border-b">
+                  <div className="grid grid-cols-6 gap-4 text-sm font-medium text-gray-700">
+                    <div>Select</div>
+                    <div>Name</div>
+                    <div>Program</div>
+                    <div>Merit Score</div>
+                    <div>Scholarship</div>
+                    <div>Amount</div>
+                  </div>
+                </div>
+                <div className="divide-y">
+                  {mockLeads.map((lead) => (
+                    <div key={lead.id} className="grid grid-cols-6 gap-4 p-3 text-sm hover:bg-gray-50">
+                      <div>
+                        <Checkbox
+                          checked={selectedLeads.includes(lead.id)}
+                          onCheckedChange={() => handleLeadSelect(lead.id)}
+                        />
+                      </div>
+                      <div className="font-medium">{lead.name}</div>
+                      <div>
+                        <Badge variant={lead.program === 'Full-Time MBA' ? 'default' : 'secondary'}>
+                          {lead.program}
+                        </Badge>
+                      </div>
+                      <div>{Math.floor(Math.random() * 30) + 70}/100</div>
+                      <div>
+                        <Badge variant={Math.random() > 0.5 ? 'default' : 'outline'}>
+                          {Math.random() > 0.5 ? 'Eligible' : 'Pending'}
+                        </Badge>
+                      </div>
+                      <div className="font-medium">
+                        ${Math.floor(Math.random() * 20000) + 5000}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
               <div className="flex items-start space-x-3">
                 <Target className="w-5 h-5 text-orange-600 mt-0.5" />
@@ -613,6 +1001,225 @@ const WorkflowBuilder = () => {
                   <p className="text-sm text-orange-700">
                     AI will optimize scholarship distribution to maximize enrollment while staying within budget. 
                     It considers merit, need, and probability of acceptance.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 6:
+        return (
+          <div className="space-y-6">
+            {/* Analytics Dashboard Header */}
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Analytics & Performance Dashboard</h3>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => exportToCSV([
+                  { metric: 'Time Saved', value: '45%', description: 'Average processing time reduction' },
+                  { metric: 'Effort Saved', value: '60%', description: 'Manual review time reduction' },
+                  { metric: 'Conversion Rate', value: '38.8%', description: 'Lead to application rate' },
+                  { metric: 'Processing Efficiency', value: '2.3x', description: 'Faster than manual process' },
+                  { metric: 'Cost Savings', value: '$125K', description: 'Annual operational savings' },
+                  { metric: 'Lead Quality Score', value: '8.2/10', description: 'AI-assessed lead quality' }
+                ], 'analytics-dashboard')}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export Analytics
+              </Button>
+            </div>
+
+            {/* Key Metrics Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Top Sources */}
+              <Card className="p-6 space-y-4">
+                <h4 className="text-lg font-semibold text-gray-900">Top Sources</h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="font-medium">University Fair</div>
+                      <div className="text-sm text-gray-600">425 leads</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-green-600">8.2%</div>
+                      <div className="text-xs text-gray-500">conversion</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="font-medium">Website</div>
+                      <div className="text-sm text-gray-600">312 leads</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-green-600">6.5%</div>
+                      <div className="text-xs text-gray-500">conversion</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="font-medium">Social Media</div>
+                      <div className="text-sm text-gray-600">289 leads</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-orange-600">4.1%</div>
+                      <div className="text-xs text-gray-500">conversion</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="font-medium">Referral</div>
+                      <div className="text-sm text-gray-600">224 leads</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-green-600">12.3%</div>
+                      <div className="text-xs text-gray-500">conversion</div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Program Performance */}
+              <Card className="p-6 space-y-4">
+                <h4 className="text-lg font-semibold text-gray-900">Program Performance</h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="font-medium">Full-Time MBA</div>
+                      <div className="text-sm text-gray-600">98 applications</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-blue-600">25</div>
+                      <div className="text-xs text-gray-500">admitted</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="font-medium">MS Cybersecurity</div>
+                      <div className="text-sm text-gray-600">145 applications</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-blue-600">38</div>
+                      <div className="text-xs text-gray-500">admitted</div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* AI Insights */}
+              <Card className="p-6 space-y-4">
+                <h4 className="text-lg font-semibold text-gray-900">AI Insights</h4>
+                <div className="space-y-3">
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="font-medium text-red-800">Alert</div>
+                    <div className="text-sm text-red-700">Applications dropped 12% last month. Social media leads showing low conversion.</div>
+                  </div>
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="font-medium text-green-800">Opportunity</div>
+                    <div className="text-sm text-green-700">University fair leads converting 2x better. Consider increasing presence.</div>
+                  </div>
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="font-medium text-blue-800">Prediction</div>
+                    <div className="text-sm text-blue-700">Spring 2026 enrollment projected at 89 students based on current trends.</div>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Efficiency Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Time & Effort Savings */}
+              <Card className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900">Time Saved</h4>
+                    <div className="text-3xl font-bold text-green-600 mt-2">45%</div>
+                    <p className="text-sm text-gray-600 mt-1">Average processing time reduction</p>
+                  </div>
+                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <BarChart3 className="w-6 h-6 text-green-600" />
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900">Processing Efficiency</h4>
+                    <div className="text-3xl font-bold text-blue-600 mt-2">2.3x</div>
+                    <p className="text-sm text-gray-600 mt-1">Faster than manual process</p>
+                  </div>
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Settings className="w-6 h-6 text-blue-600" />
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900">Cost Savings</h4>
+                    <div className="text-3xl font-bold text-purple-600 mt-2">$125K</div>
+                    <p className="text-sm text-gray-600 mt-1">Annual operational savings</p>
+                  </div>
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <Target className="w-6 h-6 text-purple-600" />
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Conversion Funnel */}
+            <Card className="p-6">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Admission Funnel & Conversion Metrics</h4>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">1,250</div>
+                  <div className="text-sm text-gray-600">Leads</div>
+                  <div className="text-xs text-green-600">+2.3% ↗</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">485</div>
+                  <div className="text-sm text-gray-600">Applications Started</div>
+                  <div className="text-xs text-gray-500">38.8%</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">320</div>
+                  <div className="text-sm text-gray-600">Applications Completed</div>
+                  <div className="text-xs text-gray-500">66.0%</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">95</div>
+                  <div className="text-sm text-gray-600">Admitted</div>
+                  <div className="text-xs text-gray-500">29.7%</div>
+                </div>
+              </div>
+              
+              <div className="mt-6 grid grid-cols-2 gap-4">
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="text-lg font-semibold">Avg Processing Time</div>
+                  <div className="text-2xl font-bold text-orange-600">12.5 days</div>
+                  <div className="text-sm text-orange-600">-0.8 days ↓</div>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="text-lg font-semibold">Lead Quality Score</div>
+                  <div className="text-2xl font-bold text-green-600">8.2/10</div>
+                  <div className="text-sm text-green-600">AI-assessed quality</div>
+                </div>
+              </div>
+            </Card>
+
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6">
+              <div className="flex items-start space-x-3">
+                <BarChart3 className="w-6 h-6 text-blue-600 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-blue-900 text-lg">Workflow Complete!</h4>
+                  <p className="text-sm text-blue-700 mt-1">
+                    Your AI-powered admission workflow is now fully configured and operational. 
+                    The system is processing leads 2.3x faster while maintaining high quality standards.
+                    Total estimated annual savings: <span className="font-semibold">$125,000</span> with 
+                    <span className="font-semibold">45% time reduction</span> in manual processing.
                   </p>
                 </div>
               </div>
@@ -631,12 +1238,12 @@ const WorkflowBuilder = () => {
       <div className="space-y-2">
         <h1 className="text-3xl font-bold text-gray-900">Workflow Builder</h1>
         <p className="text-gray-600">
-          Configure your admission process with AI-powered automation
+          Configure your admission process with AI-powered automation and program-specific workflows
         </p>
       </div>
 
       {/* Stage Progress */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {stages.map((stage) => {
           const Icon = stage.icon;
           const isActive = activeStage === stage.id;
@@ -670,10 +1277,10 @@ const WorkflowBuilder = () => {
                         : 'text-gray-600'
                   }`} />
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2">
-                    <h3 className="font-semibold text-sm">{stage.title}</h3>
-                    {isCompleted && <CheckCircle className="w-4 h-4 text-green-600" />}
+                    <h3 className="font-semibold text-sm truncate">{stage.title}</h3>
+                    {isCompleted && <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />}
                   </div>
                   <p className="text-xs text-gray-600">{stage.description}</p>
                 </div>
@@ -711,7 +1318,7 @@ const WorkflowBuilder = () => {
             </div>
             
             <Button onClick={handleNext} className="bg-blue-600 hover:bg-blue-700">
-              {activeStage === 4 ? 'Complete Setup' : 'Next'}
+              {activeStage === 6 ? 'Complete Setup' : 'Next'}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
