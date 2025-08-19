@@ -40,6 +40,12 @@ const Layout = ({ children, universityData, onLogout }) => {
       label: 'Scholarship Management',
       icon: GraduationCap,
       description: 'Manage scholarship allocation'
+    },
+    {
+      path: '/analytics-dashboard',
+      label: 'Analytics Dashboard',
+      icon: BarChart3,
+      description: 'View performance insights'
     }
   ];
 
