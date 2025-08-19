@@ -25,7 +25,6 @@ import {
   File,
   CloudUpload,
   GraduationCap,
-  BarChart3,
   Download,
   Users,
   CheckSquare,
@@ -131,13 +130,6 @@ const WorkflowBuilder = () => {
       title: 'Scholarship Rules',
       description: 'Configure scholarship eligibility and allocation',
       icon: Target,
-      isCompleted: false
-    },
-    {
-      id: 6,
-      title: 'Analytics Dashboard',
-      description: 'View efficiency metrics and performance insights',
-      icon: BarChart3,
       isCompleted: false
     }
   ];
@@ -258,7 +250,7 @@ const WorkflowBuilder = () => {
   };
 
   const handleNext = () => {
-    if (activeStage < 6) {
+    if (activeStage < 5) {
       setActiveStage(activeStage + 1);
     } else {
       // Save workflow and navigate to AI Review
@@ -1008,225 +1000,6 @@ const WorkflowBuilder = () => {
           </div>
         );
 
-      case 6:
-        return (
-          <div className="space-y-6">
-            {/* Analytics Dashboard Header */}
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">Analytics & Performance Dashboard</h3>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => exportToCSV([
-                  { metric: 'Time Saved', value: '45%', description: 'Average processing time reduction' },
-                  { metric: 'Effort Saved', value: '60%', description: 'Manual review time reduction' },
-                  { metric: 'Conversion Rate', value: '38.8%', description: 'Lead to application rate' },
-                  { metric: 'Processing Efficiency', value: '2.3x', description: 'Faster than manual process' },
-                  { metric: 'Cost Savings', value: '$125K', description: 'Annual operational savings' },
-                  { metric: 'Lead Quality Score', value: '8.2/10', description: 'AI-assessed lead quality' }
-                ], 'analytics-dashboard')}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export Analytics
-              </Button>
-            </div>
-
-            {/* Key Metrics Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Top Sources */}
-              <Card className="p-6 space-y-4">
-                <h4 className="text-lg font-semibold text-gray-900">Top Sources</h4>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-medium">University Fair</div>
-                      <div className="text-sm text-gray-600">425 leads</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-green-600">8.2%</div>
-                      <div className="text-xs text-gray-500">conversion</div>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-medium">Website</div>
-                      <div className="text-sm text-gray-600">312 leads</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-green-600">6.5%</div>
-                      <div className="text-xs text-gray-500">conversion</div>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-medium">Social Media</div>
-                      <div className="text-sm text-gray-600">289 leads</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-orange-600">4.1%</div>
-                      <div className="text-xs text-gray-500">conversion</div>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-medium">Referral</div>
-                      <div className="text-sm text-gray-600">224 leads</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-green-600">12.3%</div>
-                      <div className="text-xs text-gray-500">conversion</div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Program Performance */}
-              <Card className="p-6 space-y-4">
-                <h4 className="text-lg font-semibold text-gray-900">Program Performance</h4>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-medium">Full-Time MBA</div>
-                      <div className="text-sm text-gray-600">98 applications</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-blue-600">25</div>
-                      <div className="text-xs text-gray-500">admitted</div>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-medium">MS Cybersecurity</div>
-                      <div className="text-sm text-gray-600">145 applications</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-blue-600">38</div>
-                      <div className="text-xs text-gray-500">admitted</div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              {/* AI Insights */}
-              <Card className="p-6 space-y-4">
-                <h4 className="text-lg font-semibold text-gray-900">AI Insights</h4>
-                <div className="space-y-3">
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <div className="font-medium text-red-800">Alert</div>
-                    <div className="text-sm text-red-700">Applications dropped 12% last month. Social media leads showing low conversion.</div>
-                  </div>
-                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="font-medium text-green-800">Opportunity</div>
-                    <div className="text-sm text-green-700">University fair leads converting 2x better. Consider increasing presence.</div>
-                  </div>
-                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div className="font-medium text-blue-800">Prediction</div>
-                    <div className="text-sm text-blue-700">Spring 2026 enrollment projected at 89 students based on current trends.</div>
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            {/* Efficiency Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Time & Effort Savings */}
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900">Time Saved</h4>
-                    <div className="text-3xl font-bold text-green-600 mt-2">45%</div>
-                    <p className="text-sm text-gray-600 mt-1">Average processing time reduction</p>
-                  </div>
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <BarChart3 className="w-6 h-6 text-green-600" />
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900">Processing Efficiency</h4>
-                    <div className="text-3xl font-bold text-blue-600 mt-2">2.3x</div>
-                    <p className="text-sm text-gray-600 mt-1">Faster than manual process</p>
-                  </div>
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Settings className="w-6 h-6 text-blue-600" />
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900">Cost Savings</h4>
-                    <div className="text-3xl font-bold text-purple-600 mt-2">$125K</div>
-                    <p className="text-sm text-gray-600 mt-1">Annual operational savings</p>
-                  </div>
-                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <Target className="w-6 h-6 text-purple-600" />
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            {/* Conversion Funnel */}
-            <Card className="p-6">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">Admission Funnel & Conversion Metrics</h4>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">1,250</div>
-                  <div className="text-sm text-gray-600">Leads</div>
-                  <div className="text-xs text-green-600">+2.3% ↗</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">485</div>
-                  <div className="text-sm text-gray-600">Applications Started</div>
-                  <div className="text-xs text-gray-500">38.8%</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">320</div>
-                  <div className="text-sm text-gray-600">Applications Completed</div>
-                  <div className="text-xs text-gray-500">66.0%</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">95</div>
-                  <div className="text-sm text-gray-600">Admitted</div>
-                  <div className="text-xs text-gray-500">29.7%</div>
-                </div>
-              </div>
-              
-              <div className="mt-6 grid grid-cols-2 gap-4">
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <div className="text-lg font-semibold">Avg Processing Time</div>
-                  <div className="text-2xl font-bold text-orange-600">12.5 days</div>
-                  <div className="text-sm text-orange-600">-0.8 days ↓</div>
-                </div>
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <div className="text-lg font-semibold">Lead Quality Score</div>
-                  <div className="text-2xl font-bold text-green-600">8.2/10</div>
-                  <div className="text-sm text-green-600">AI-assessed quality</div>
-                </div>
-              </div>
-            </Card>
-
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6">
-              <div className="flex items-start space-x-3">
-                <BarChart3 className="w-6 h-6 text-blue-600 mt-0.5" />
-                <div>
-                  <h4 className="font-medium text-blue-900 text-lg">Workflow Complete!</h4>
-                  <p className="text-sm text-blue-700 mt-1">
-                    Your AI-powered admission workflow is now fully configured and operational. 
-                    The system is processing leads 2.3x faster while maintaining high quality standards.
-                    Total estimated annual savings: <span className="font-semibold">$125,000</span> with 
-                    <span className="font-semibold">45% time reduction</span> in manual processing.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
       default:
         return null;
     }
@@ -1318,7 +1091,7 @@ const WorkflowBuilder = () => {
             </div>
             
             <Button onClick={handleNext} className="bg-blue-600 hover:bg-blue-700">
-              {activeStage === 6 ? 'Complete Setup' : 'Next'}
+              {activeStage === 5 ? 'Complete Setup' : 'Next'}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>

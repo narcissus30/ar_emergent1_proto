@@ -8,6 +8,7 @@ import WorkflowBuilder from './screens/WorkflowBuilder';
 import AIReviewScreen from './screens/AIReviewScreen';
 import ApplicationDistribution from './screens/ApplicationDistribution';
 import ScholarshipManagement from './screens/ScholarshipManagement';
+import AnalyticsDashboard from './screens/AnalyticsDashboard';
 
 // Layout Component
 import Layout from './components/Layout';
@@ -50,6 +51,7 @@ function App() {
                     <Route path="/ai-review" element={<AIReviewScreen />} />
                     <Route path="/application-distribution" element={<ApplicationDistribution />} />
                     <Route path="/scholarship-management" element={<ScholarshipManagement />} />
+                    <Route path="/analytics-dashboard" element={<AnalyticsDashboard />} />
                     <Route path="/" element={<Navigate to="/workflow-builder" />} />
                   </Routes>
                 </Layout>
