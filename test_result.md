@@ -189,6 +189,42 @@ test_plan:
   test_all: true
   test_priority: "high_first"
 
+  - task: "Removed Analytics Dashboard from WorkflowBuilder - back to 5 stages"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/screens/WorkflowBuilder.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Successfully removed Analytics Dashboard from WorkflowBuilder, now has 5 stages: Lead Source Integration, Program Configuration, Application Requirements, Admission Criteria, Scholarship Rules"
+
+  - task: "Created separate Analytics Dashboard screen after Scholarship Management"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/screens/AnalyticsDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Created comprehensive Analytics Dashboard as separate screen with funnel metrics (38.8%, 29.7%, 75.8%, 12.5 days), qualitative metrics (67% time savings, $150K cost reduction, 3.2x productivity, 8.7/10 quality, 94% reputation, 45% international growth), program performance analysis, and AI insights"
+
+  - task: "Updated navigation routing to include Analytics Dashboard after Scholarship Management"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js, /app/frontend/src/components/Layout.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Added Analytics Dashboard route and navigation item as the final screen in the application flow, positioned after Scholarship Management with BarChart3 icon"
+
 agent_communication:
   - agent: "main"
-    message: "Successfully implemented all requested features for the workflow builder enhancement. Added new Program Configuration stage, comprehensive Analytics Dashboard with 6 metrics (3 from screenshots + 3 custom), export functionality across stages 2-6, bulk selection for leads, and made all workflow stages program-aware. The implementation includes Full-Time MBA and MS in Cybersecurity program options as requested. Ready for testing."
+    message: "Successfully restructured the application: 1) Removed Analytics Dashboard from WorkflowBuilder (back to 5 stages), 2) Created separate comprehensive Analytics Dashboard screen as final step after Scholarship Management, 3) Updated routing and navigation, 4) Analytics Dashboard shows funnel metrics from uploaded images plus creative qualitative metrics like time savings, cost reduction, staff productivity, university reputation, and international growth. The dashboard provides holistic view of university benefits from AI implementation."
